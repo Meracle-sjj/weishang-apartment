@@ -1,0 +1,7 @@
+<!--
+ [INPUT]: 站点鼠尾草绿与门廊线稿的视觉意象。
+ [OUTPUT]: 浏览器标签页图标。
+ [POS]: assets 的独立矢量标识，与页头品牌门廊呼应。
+ [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#f5f3ec"/><path d="M12 51V22L32 8l20 14v29M23 51V27h18v24M9 51h46M32 27v24" fill="none" stroke="#748477" stroke-width="2"/></svg>

@@ -1,0 +1,313 @@
+/*
+ * [INPUT]: index.html 的语义章节、图文编号与对话框；assets/fonts 的本地开放字体。
+ * [OUTPUT]: 页面色彩与排版、图片叙事布局、移动端适配和无障碍交互反馈。
+ * [POS]: 站点唯一视觉系统；CSS 负责静态呈现，脚本只添加导航状态和图片对话框。
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
+
+/* -- 字体与设计基准 -- */
+@font-face {
+  font-family: "Weishang Serif";
+  src: url("assets/fonts/noto-serif-sc.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("assets/fonts/cormorant-garamond.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("assets/fonts/cormorant-garamond-italic.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 300 700;
+  font-display: swap;
+}
+:root {
+  --paper: #f5f3ec;
+  --ink: #303d37;
+  --muted: #667168;
+  --sage: #748477;
+  --sage-pale: #e9ede5;
+  --line: #d4d8cd;
+  --serif: "Weishang Serif", "Songti SC", "Noto Serif CJK SC", serif;
+  --latin: "Cormorant Garamond", Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 112px; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 15px; -webkit-font-smoothing: antialiased; }
+::selection { background: #d9dfd0; color: #263c2e; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; }
+img { display: block; width: 100%; height: auto; }
+figure, p, h1, h2, h3 { margin: 0; }
+a, button { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid #466750; outline-offset: 6px; }
+.page-width { width: min(1280px, calc(100% - 112px)); margin-inline: auto; }
+.english { color: var(--muted); font-family: var(--latin); font-size: 21px; line-height: 1.45; font-weight: 500; }
+.eyebrow { display: flex; align-items: center; gap: 10px; font-family: var(--sans); font-size: 10px; font-weight: 500; line-height: 1.6; letter-spacing: .15em; }
+.eyebrow > span:first-child:empty { display: inline-block; width: 20px; height: 1px; background: var(--sage); }
+.eyebrow-separator { color: #b3bbae; margin-inline: 1px; }
+.soft-ink { color: var(--sage); }
+.caption-divider { margin-inline: 8px; color: #a8b0a3; }
+.skip-link { position: fixed; z-index: 30; left: 20px; top: -80px; background: var(--ink); color: white; padding: 16px 22px; }
+.skip-link:focus { top: 12px; }
+
+/* -- 固定导航与阅读进度 -- */
+.site-header { position: sticky; z-index: 10; top: 0; background: rgba(245,243,236,.96); border-bottom: 1px solid var(--line); backdrop-filter: blur(14px); }
+.header-inner { display: flex; align-items: center; justify-content: space-between; width: min(1440px, calc(100% - 80px)); min-height: 100px; margin-inline: auto; gap: 28px; }
+.wordmark { display: flex; align-items: center; gap: 14px; flex-shrink: 0; font-family: var(--serif); font-size: 21px; font-weight: 600; letter-spacing: .12em; }
+.brand-mark { width: 29px; height: 37px; stroke: var(--sage); stroke-width: 1.2; }
+.wordmark small { display: block; margin-top: 6px; font-family: var(--sans); font-size: 8px; font-weight: 400; letter-spacing: .2em; }
+.main-nav { display: flex; align-items: center; gap: 42px; }
+.main-nav a { position: relative; padding: 12px 0; font-size: 12px; letter-spacing: .08em; white-space: nowrap; }
+.nav-number { margin-right: 7px; color: var(--sage); font-size: 10px; letter-spacing: .03em; }
+.main-nav a::after { content: ""; position: absolute; bottom: 1px; left: 0; right: 0; height: 1px; background: var(--sage); transform: scaleX(0); transform-origin: left; transition: transform .25s ease; }
+.main-nav a:hover::after, .main-nav a[aria-current]::after { transform: scaleX(1); }
+.header-note { color: var(--muted); font-size: 9px; letter-spacing: .17em; }
+.reading-progress { position: absolute; left: 0; bottom: -1px; width: var(--reading-progress, 0%); height: 2px; background: var(--sage); }
+
+/* -- 首屏：以建筑效果示意建立场所印象 -- */
+.hero { display: grid; grid-template-columns: .84fr 1.4fr; align-items: center; column-gap: 48px; padding-top: 70px; }
+.hero-copy { padding-bottom: 18px; }
+.hero h1 { margin-top: 32px; font-family: var(--serif); font-size: clamp(44px, 4.7vw, 68px); font-weight: 500; line-height: 1.45; letter-spacing: .025em; }
+.hero-english { margin-top: 12px; font-family: var(--latin); font-size: 36px; font-style: italic; line-height: 1.2; }
+.hero-description { margin-top: 27px; font-size: 13px; line-height: 2.1; letter-spacing: .04em; }
+.hero-translation { margin-top: 10px; font-size: 19px; }
+.text-link { display: inline-grid; grid-template-columns: 1fr auto; column-gap: 28px; align-items: center; padding-bottom: 11px; border-bottom: 1px solid #98a28f; font-size: 12px; line-height: 1.6; letter-spacing: .07em; }
+.text-link > span { font-size: 22px; transition: transform .25s; }
+.text-link:hover > span { transform: translate(3px,-3px); }
+.text-link small { grid-column: 1; font-size: 8px; letter-spacing: .14em; color: var(--muted); }
+.hero-link { margin-top: 30px; }
+.hero-figure { position: relative; padding-right: 14px; }
+.hero-image { aspect-ratio: 1.3; background: #e9e9e7; }
+.hero-image img { object-position: center; }
+.hero-side-note { position: absolute; right: -22px; top: 0; writing-mode: vertical-rl; font-size: 8px; letter-spacing: .22em; color: var(--muted); }
+.hero-figure figcaption { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; font-size: 9px; line-height: 1.7; letter-spacing: .03em; }
+.hero-footnote { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; margin-top: 52px; padding-block: 24px; border-top: 1px solid var(--line); font-size: 10px; letter-spacing: .15em; }
+.hero-footnote > span:first-child { color: var(--muted); font-size: 9px; letter-spacing: .12em; }
+.hero-footnote a { display: flex; gap: 25px; align-items: center; font-size: 10px; letter-spacing: .05em; }
+.hero-footnote a span { font-size: 20px; }
+
+/* -- 图片、图注与双语内容的共同边界 -- */
+.image-link { position: relative; display: block; overflow: hidden; }
+.image-link img { height: 100%; object-fit: cover; transition: transform .7s cubic-bezier(.2,.65,.2,1); }
+.image-link:hover img { transform: scale(1.025); }
+.image-open { position: absolute; right: 14px; bottom: 14px; display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid rgba(255,255,255,.65); border-radius: 50%; background: rgba(245,243,236,.9); color: var(--ink); font-size: 19px; opacity: 0; transform: translateY(5px); transition: opacity .25s, transform .25s; }
+.image-link:hover .image-open, .image-link:focus-visible .image-open { opacity: 1; transform: translateY(0); }
+figcaption { margin-top: 13px; color: var(--muted); font-size: 10px; letter-spacing: .04em; line-height: 1.6; }
+figcaption [lang="en"] { font-size: 10px; }
+.image-number { display: inline-block; margin-right: 10px; font-size: 9px; }
+h2, h3 { font-family: var(--serif); font-weight: 500; }
+h2 { font-size: clamp(26px, 2.4vw, 34px); line-height: 1.7; letter-spacing: .03em; }
+h3 { font-size: 27px; line-height: 1.7; letter-spacing: .025em; }
+.story-copy { margin-top: 28px; }
+.story-copy .eyebrow { margin-bottom: 12px; color: var(--muted); font-size: 9px; }
+.story-copy > p:not(.eyebrow):not(.english), .amenity-copy > p:not(.eyebrow):not(.english):not(.location-label), .corridor-copy > p:not(.eyebrow):not(.english) { margin-top: 15px; font-size: 13px; line-height: 2.15; letter-spacing: .035em; }
+.story-copy .english, .amenity-copy .english, .corridor-copy .english { margin-top: 14px; }
+.chapter { padding-top: 112px; padding-bottom: 112px; }
+.chapter-heading { display: grid; grid-template-columns: .8fr 1.7fr; align-items: start; gap: 48px; margin-bottom: 62px; }
+.chapter-index { display: flex; align-items: center; gap: 18px; padding-top: 10px; }
+.chapter-index > span:first-child { font-family: var(--latin); font-size: 40px; font-weight: 400; line-height: 1; color: var(--sage); }
+.chapter-index > span:last-child { font-family: var(--serif); font-size: 15px; letter-spacing: .12em; }
+.chapter-index small { display: block; margin-top: 7px; font-family: var(--sans); font-size: 8px; letter-spacing: .13em; }
+.section-english { margin-top: 7px; color: var(--muted); font-family: var(--latin); font-style: italic; font-size: 26px; line-height: 1.3; }
+
+/* -- 第一章：抵达、接待与归途 -- */
+.welcome-grid { display: grid; grid-template-columns: 1.18fr 1fr; gap: 92px; }
+.entrance-image { aspect-ratio: 1.23; }
+.entrance-image img { object-position: 50% 60%; }
+.lobby-story { padding-top: 135px; }
+.lobby-image { aspect-ratio: 1.5; }
+.corridor-story { position: relative; display: grid; grid-template-columns: .8fr 1.25fr; gap: 70px; align-items: center; margin-top: 84px; padding: 44px; background: var(--sage-pale); overflow: hidden; }
+.corridor-story figure { position: relative; z-index: 1; max-width: 300px; }
+.corridor-image { aspect-ratio: .9; }
+.corridor-image img { object-position: center 60%; }
+.corridor-copy { position: relative; z-index: 1; max-width: 470px; padding-bottom: 20px; }
+.corridor-copy h3 { margin-top: 20px; font-size: 31px; }
+.quiet-line { display: block; width: 46px; height: 1px; background: #96a18d; margin-top: 25px; }
+.corridor-decoration { position: absolute; bottom: -21px; right: 32px; color: rgba(116,132,119,.1); font-family: var(--latin); font-size: 125px; font-style: italic; line-height: 1; }
+
+/* -- 第二章：便民配套，以一个主图和三个细节展开 -- */
+.everyday-section { background: #e9ece4; padding-block: 104px 110px; }
+.everyday-section .chapter-heading { margin-bottom: 60px; }
+.amenity-feature { display: grid; grid-template-columns: 1.45fr .9fr; align-items: center; gap: 66px; }
+.amenities-image { aspect-ratio: 1.46; }
+.amenity-copy { padding-bottom: 25px; }
+.amenity-copy h3 { margin-top: 20px; font-size: 31px; }
+.location-label { display: flex; align-items: center; gap: 12px; margin-top: 26px; padding-top: 17px; border-top: 1px solid #cbd2c4; font-size: 10px; letter-spacing: .06em; }
+.location-label [lang="en"] { font-size: 8px; }
+.service-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 38px; margin-top: 70px; padding-top: 48px; border-top: 1px solid #cbd2c4; }
+.service-image { aspect-ratio: .95; }
+.dryer-image img { object-position: 49% center; }
+.laundry-image img { object-position: center 55%; }
+.printer-image img { object-position: center 60%; }
+.service-story figcaption { display: flex; justify-content: space-between; align-items: center; font-size: 8px; }
+.service-story figcaption [lang="en"] { font-size: 8px; letter-spacing: .11em; }
+.service-heading { display: flex; gap: 8px; justify-content: space-between; align-items: start; margin-top: 25px; }
+.service-heading h3 { font-size: 20px; line-height: 1.8; }
+.service-tag { flex-shrink: 0; padding-top: 8px; color: #59694e; font-size: 9px; letter-spacing: .04em; }
+.service-story > p:not(.english) { margin-top: 12px; font-size: 12px; line-height: 2; letter-spacing: .03em; }
+.service-story .english { margin-top: 12px; font-size: 20px; }
+
+/* -- 第三章：留给球桌与窗外的慢节奏 -- */
+.leisure-section { padding-top: 114px; padding-bottom: 110px; }
+.leisure-grid { display: grid; grid-template-columns: 1.07fr .9fr; gap: 115px; }
+.billiard-image { aspect-ratio: .8; }
+.billiard-image img { object-position: center 60%; }
+.balcony-intro { padding-top: 20px; padding-bottom: 42px; }
+.balcony-intro .eyebrow { font-size: 9px; }
+.balcony-quote { margin-top: 20px; font-family: var(--serif); font-size: 32px; line-height: 1.9; letter-spacing: .05em; }
+.balcony-image { aspect-ratio: .88; }
+.balcony-image img { object-position: center; }
+.balcony-story .story-copy h3 { font-size: 25px; }
+.closing { background: #e5e9df; text-align: center; padding-block: 82px 76px; }
+.closing-inner > .eyebrow { justify-content: center; color: var(--muted); font-size: 9px; }
+.closing-title { margin-top: 27px; font-family: var(--serif); font-size: clamp(25px, 3vw, 38px); line-height: 1.7; letter-spacing: .06em; }
+.closing-english { margin-top: 11px; font-family: var(--latin); font-size: 28px; font-style: italic; color: var(--muted); }
+.closing .text-link { margin-top: 34px; text-align: left; }
+.closing .text-link:hover > span { transform: translateY(-4px); }
+.site-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-block: 34px; font-size: 9px; color: var(--muted); line-height: 1.8; }
+.footer-brand { font-family: var(--serif); color: var(--ink); font-size: 14px; }
+.footer-brand span { display: inline-block; margin-left: 8px; font-family: var(--latin); font-size: 17px; }
+.footer-note { letter-spacing: .1em; }
+
+/* -- 原图对话框：保留照片完整构图 -- */
+.lightbox { width: min(1200px, calc(100vw - 48px)); max-width: none; max-height: calc(100dvh - 40px); padding: 0 24px 20px; border: none; background: var(--paper); color: var(--ink); }
+.lightbox::backdrop { background: rgba(22,31,25,.86); backdrop-filter: blur(5px); }
+.lightbox-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 64px; font-size: 13px; }
+.lightbox-close { flex: 0 0 44px; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 50%; color: var(--ink); background: transparent; cursor: pointer; font-size: 28px; line-height: 1; }
+.lightbox-image { width: 100%; height: auto; max-height: calc(100dvh - 170px); object-fit: contain; }
+.lightbox-hint { margin-top: 16px; text-align: center; color: var(--muted); font-size: 10px; line-height: 1.8; }
+body:has(.lightbox[open]) { overflow: hidden; }
+
+/* -- 平板与窄屏：保留叙事顺序，减少装饰性留白 -- */
+@media (min-width: 1600px) {
+  .hero { padding-top: 85px; }
+  .hero-image { aspect-ratio: 1.3; }
+}
+@media (max-width: 1150px) {
+  .page-width { width: calc(100% - 80px); }
+  .header-inner { width: calc(100% - 56px); min-height: 88px; }
+  .header-note { display: none; }
+  .main-nav { gap: 30px; }
+  .hero { column-gap: 32px; padding-top: 58px; }
+  .hero h1 { font-size: 51px; }
+  .hero-english { font-size: 31px; }
+  .hero-description { font-size: 12px; }
+  .hero-translation { font-size: 18px; }
+  .hero-figure figcaption { flex-direction: column; gap: 2px; }
+  .welcome-grid { gap: 56px; }
+  .chapter-heading { grid-template-columns: .7fr 1.7fr; gap: 30px; }
+  .corridor-story { gap: 40px; padding: 36px; }
+  .corridor-copy h3, .amenity-copy h3 { font-size: 27px; }
+  .amenity-feature { gap: 40px; grid-template-columns: 1.2fr .9fr; }
+  .service-grid { gap: 25px; }
+  .service-heading { flex-direction: column; gap: 0; }
+  .service-tag { padding-top: 2px; }
+  .leisure-grid { gap: 70px; }
+  .site-footer { flex-wrap: wrap; }
+}
+@media (max-width: 760px) {
+  html { scroll-padding-top: 122px; }
+  .page-width { width: calc(100% - 40px); }
+  .header-inner { width: calc(100% - 40px); min-height: auto; padding: 17px 0 10px; flex-wrap: wrap; gap: 12px; }
+  .wordmark { font-size: 17px; gap: 10px; }
+  .wordmark small { font-size: 7px; margin-top: 4px; }
+  .brand-mark { width: 23px; height: 30px; }
+  .main-nav { width: 100%; justify-content: space-between; gap: 12px; }
+  .main-nav a { padding-block: 8px; font-size: 11px; }
+  .nav-number { font-size: 9px; margin-right: 5px; }
+  .hero { display: flex; flex-direction: column; align-items: stretch; padding-top: 38px; }
+  .hero-copy { padding-bottom: 32px; }
+  .hero-copy > .eyebrow { font-size: 8px; gap: 7px; letter-spacing: .1em; }
+  .hero h1 { margin-top: 22px; font-size: clamp(42px, 10vw, 58px); line-height: 1.4; }
+  .hero h1 br { display: initial; }
+  .hero-english { margin-top: 10px; font-size: 31px; }
+  .hero-description { margin-top: 20px; font-size: 12px; }
+  .hero-translation { font-size: 18px; }
+  .hero-link { margin-top: 22px; }
+  .hero-figure { padding: 0; }
+  .hero-image { aspect-ratio: 1.36; }
+  .hero-side-note { display: none; }
+  .hero-figure figcaption { flex-direction: row; font-size: 8px; }
+  .hero-figure figcaption [lang="en"] { font-size: 8px; }
+  .hero-figure .caption-divider { margin-inline: 3px; }
+  .hero-footnote { margin-top: 25px; padding-block: 18px; gap: 14px; font-size: 9px; }
+  .hero-footnote > span:first-child { display: none; }
+  .hero-footnote a { font-size: 9px; gap: 15px; }
+  .chapter { padding-block: 64px; }
+  .chapter-heading { display: block; margin-bottom: 32px; }
+  .chapter-index { padding-top: 0; gap: 12px; margin-bottom: 25px; }
+  .chapter-index > span:first-child { font-size: 32px; }
+  .chapter-index > span:last-child { font-size: 12px; }
+  .chapter-index small { font-size: 7px; margin-top: 5px; }
+  h2 { font-size: clamp(23px, 5.3vw, 30px); letter-spacing: .01em; }
+  h3 { font-size: 24px; }
+  .section-english { font-size: 23px; margin-top: 5px; }
+  .welcome-grid { grid-template-columns: 1fr; gap: 40px; }
+  .entrance-image { aspect-ratio: 1.25; }
+  .lobby-story { padding: 0; }
+  .lobby-image { aspect-ratio: 1.5; }
+  .story-copy { margin-top: 20px; }
+  .story-copy .eyebrow { margin-bottom: 8px; font-size: 8px; }
+  .story-copy > p:not(.eyebrow):not(.english), .amenity-copy > p:not(.eyebrow):not(.english):not(.location-label), .corridor-copy > p:not(.eyebrow):not(.english) { font-size: 12px; line-height: 2; margin-top: 10px; }
+  .english { font-size: 20px; line-height: 1.4; }
+  .story-copy .english, .amenity-copy .english, .corridor-copy .english { margin-top: 10px; }
+  .corridor-story { grid-template-columns: 1fr; padding: 24px; margin-top: 42px; gap: 24px; }
+  .corridor-story figure { max-width: none; }
+  .corridor-image { aspect-ratio: 1.2; }
+  .corridor-image img { object-position: center 65%; }
+  .corridor-copy { padding-bottom: 15px; }
+  .corridor-copy h3 { margin-top: 10px; font-size: 25px; }
+  .corridor-decoration { font-size: 90px; bottom: -12px; right: 18px; }
+  .everyday-section { padding-block: 64px; }
+  .everyday-section .chapter-heading { margin-bottom: 32px; }
+  .amenity-feature { grid-template-columns: 1fr; gap: 26px; }
+  .amenity-copy { padding-bottom: 0; }
+  .amenity-copy h3 { margin-top: 12px; font-size: 25px; }
+  .amenity-copy h3 br { display: none; }
+  .amenities-image { aspect-ratio: 1.5; }
+  .location-label { margin-top: 20px; padding-top: 15px; }
+  .service-grid { grid-template-columns: 1fr; gap: 38px; margin-top: 36px; padding-top: 32px; }
+  .service-image { aspect-ratio: 1.2; }
+  .dryer-image img { object-position: center; }
+  .laundry-image img { object-position: center 65%; }
+  .printer-image img { object-position: center 62%; }
+  .service-heading { flex-direction: row; align-items: center; margin-top: 18px; }
+  .service-heading h3 { font-size: 22px; }
+  .service-story > p:not(.english) { margin-top: 8px; }
+  .service-story .english { margin-top: 8px; }
+  .leisure-grid { grid-template-columns: 1fr; gap: 40px; }
+  .billiard-image { aspect-ratio: .95; }
+  .balcony-intro { padding: 8px 0 26px; }
+  .balcony-quote { font-size: 28px; margin-top: 12px; }
+  .balcony-intro .quiet-line { margin-top: 16px; }
+  .balcony-image { aspect-ratio: 1.1; }
+  .closing { padding-block: 50px; }
+  .closing-title { font-size: clamp(21px, 5.5vw, 28px); margin-top: 22px; letter-spacing: .02em; }
+  .closing-english { font-size: 23px; }
+  .closing .text-link { margin-top: 26px; }
+  .site-footer { flex-direction: column; align-items: flex-start; gap: 12px; padding-block: 25px; }
+  .footer-note { display: none; }
+  .lightbox { width: calc(100vw - 24px); padding: 0 14px 14px; }
+  .lightbox-toolbar { min-height: 64px; font-size: 11px; }
+  .lightbox-hint { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; }
+}
+@media print {
+  .site-header { position: static; }
+  .reading-progress, .image-open, .hero-footnote, .lightbox, .hero-link, .closing .text-link { display: none; }
+  .chapter, .everyday-section, .closing { padding-block: 30px; }
+  .page-width { width: 94%; }
+  article { break-inside: avoid; }
+  a { color: inherit; }
+}
